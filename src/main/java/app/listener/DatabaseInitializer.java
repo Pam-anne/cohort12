@@ -1,13 +1,16 @@
 package app.listener;
 
+import app.dao.BaseDAO;
 import app.database.DatabaseConnection;
 import app.database.SchemaManager;
 import app.model.Person;
 import app.model.School;
 import app.model.Trainer;
+import app.model.User;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,12 +26,17 @@ import java.util.List;
 @WebListener
 public class DatabaseInitializer implements ServletContextListener {
 
-    /** Register every @Cohort12Form/@Cohort12Table entity here. */
+    /** Register every persisted entity here. */
     private static final List<Class<?>> ENTITIES = Arrays.asList(
             Person.class,
             School.class,
-            Trainer.class
+            Trainer.class,
+            User.class
     );
+
+    private static final String DEFAULT_ADMIN_USERNAME = "admin";
+    private static final String DEFAULT_ADMIN_PASSWORD = "12345";
+    private static final String DEFAULT_ADMIN_FULL_NAME = "Mike Bavon";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -42,11 +50,26 @@ public class DatabaseInitializer implements ServletContextListener {
                 SchemaManager.ensureTable(entity);
             }
 
+            seedDefaultAdmin();
+
             System.out.println("[DatabaseInitializer] Database layer ready.");
         } catch (Exception e) {
             System.err.println("[DatabaseInitializer] Startup failed: " + e.getMessage());
             throw new RuntimeException("Database bootstrap failed", e);
         }
+    }
+
+    private void seedDefaultAdmin() {
+        BaseDAO<User> userDao = new BaseDAO<>(User.class);
+        if (userDao.findBy("username", DEFAULT_ADMIN_USERNAME) != null) {
+            return;
+        }
+        User admin = new User(
+                DEFAULT_ADMIN_USERNAME,
+                BCrypt.hashpw(DEFAULT_ADMIN_PASSWORD, BCrypt.gensalt()),
+                DEFAULT_ADMIN_FULL_NAME);
+        userDao.insert(admin);
+        System.out.println("[DatabaseInitializer] Seeded default admin user.");
     }
 
     @Override

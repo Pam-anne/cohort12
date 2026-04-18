@@ -51,20 +51,42 @@ public class BaseDAO<T> {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                T instance = entityClass.newInstance();
-                for (Field f : fields) {
-                    Object value = rs.getObject(SchemaManager.columnName(f));
-                    if (value != null) {
-                        f.set(instance, coerce(value, f.getType()));
-                    }
-                }
-                result.add(instance);
+                result.add(mapRow(rs));
             }
         } catch (SQLException | IllegalAccessException | InstantiationException e) {
             throw new RuntimeException("Select failed for " + tableName + ": " + e.getMessage(), e);
         }
 
         return result;
+    }
+
+    public T findBy(String columnName, Object value) {
+        String sql = selectColumns() + " FROM \"" + tableName + "\""
+                + " WHERE \"" + columnName + "\" = ? LIMIT 1";
+
+        try (PreparedStatement ps = DatabaseConnection.get().prepareStatement(sql)) {
+            ps.setObject(1, value);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+                return null;
+            }
+        } catch (SQLException | IllegalAccessException | InstantiationException e) {
+            throw new RuntimeException("findBy " + columnName + " failed for "
+                    + tableName + ": " + e.getMessage(), e);
+        }
+    }
+
+    private T mapRow(ResultSet rs) throws SQLException, IllegalAccessException, InstantiationException {
+        T instance = entityClass.newInstance();
+        for (Field f : fields) {
+            Object value = rs.getObject(SchemaManager.columnName(f));
+            if (value != null) {
+                f.set(instance, coerce(value, f.getType()));
+            }
+        }
+        return instance;
     }
 
     private String buildInsertSql() {
@@ -75,19 +97,23 @@ public class BaseDAO<T> {
                 cols.append(", ");
                 vals.append(", ");
             }
-            cols.append(SchemaManager.columnName(fields.get(i)));
+            cols.append('"').append(SchemaManager.columnName(fields.get(i))).append('"');
             vals.append('?');
         }
-        return "INSERT INTO " + tableName + " (" + cols + ") VALUES (" + vals + ")";
+        return "INSERT INTO \"" + tableName + "\" (" + cols + ") VALUES (" + vals + ")";
     }
 
     private String buildSelectSql() {
+        return selectColumns() + " FROM \"" + tableName + "\" ORDER BY id";
+    }
+
+    private String selectColumns() {
         StringBuilder cols = new StringBuilder();
         for (int i = 0; i < fields.size(); i++) {
             if (i > 0) cols.append(", ");
-            cols.append(SchemaManager.columnName(fields.get(i)));
+            cols.append('"').append(SchemaManager.columnName(fields.get(i))).append('"');
         }
-        return "SELECT " + cols + " FROM " + tableName + " ORDER BY id";
+        return "SELECT " + cols;
     }
 
     private Object toSqlValue(Object value) {

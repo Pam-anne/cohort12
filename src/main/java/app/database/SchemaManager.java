@@ -61,12 +61,12 @@ public final class SchemaManager {
         }
 
         StringBuilder ddl = new StringBuilder();
-        ddl.append("CREATE TABLE IF NOT EXISTS ").append(tableName).append(" (");
+        ddl.append("CREATE TABLE IF NOT EXISTS \"").append(tableName).append("\" (");
         ddl.append("id SERIAL PRIMARY KEY");
 
         for (Field f : fields) {
-            ddl.append(", ").append(columnName(f))
-                    .append(' ').append(sqlType(f.getType()));
+            ddl.append(", \"").append(columnName(f)).append("\" ")
+                    .append(sqlType(f.getType()));
         }
 
         ddl.append(")");

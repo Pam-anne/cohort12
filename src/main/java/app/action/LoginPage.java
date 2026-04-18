@@ -1,24 +1,19 @@
 package app.action;
 
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletContext;
+import app.dao.BaseDAO;
+import app.model.User;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebInitParam;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet(name = "Login",
-    urlPatterns = { "/login" },
-    initParams = {
-            @WebInitParam(name = "username", value = "admin"),
-            @WebInitParam(name = "password", value = "12345")
-    })
+@WebServlet(name = "Login", urlPatterns = { "/login" })
 public class LoginPage extends HttpServlet {
 
     @Override
@@ -83,33 +78,19 @@ public class LoginPage extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        ServletConfig config = getServletConfig();
-        ServletContext context = getServletContext();
-
         String username = request.getParameter("username");
-        if (username == null)
-            username = "";
+        if (username == null) username = "";
         String password = request.getParameter("password");
-        if  (password == null)
-            password = "";
+        if (password == null) password = "";
 
-        System.out.println("submitted: " + username + " && " + password);
+        BaseDAO<User> userDao = new BaseDAO<>(User.class);
+        User user = userDao.findBy("username", username);
 
-        String usernameConfig = config.getInitParameter("username");
-        String passwordConfig = config.getInitParameter("password");
-        System.out.println("configs: username - " + usernameConfig);
-        System.out.println("configs: password - " + passwordConfig);
-
-        if(username.equalsIgnoreCase(usernameConfig)
-                && password.equalsIgnoreCase(passwordConfig)){
-            //you must create new session
+        if (user != null && BCrypt.checkpw(password, user.getPassword())) {
             HttpSession session = request.getSession(true);
-            session.setAttribute("UserActualName", "Mike Bavon");
-            System.out.println("session.getId(): " + session.getId());
+            session.setAttribute("UserActualName", user.getFullName());
             session.setAttribute("SESSION_ID", session.getId());
-
             response.sendRedirect("./home");
-
         } else {
             request.getSession().invalidate();
             response.sendRedirect("./login");
