@@ -1,6 +1,5 @@
 package app.action;
 
-import app.action.BaseAction;
 import app.model.Trainer;
 import jakarta.servlet.annotation.WebInitParam;
 import jakarta.servlet.annotation.WebServlet;
