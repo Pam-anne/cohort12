@@ -5,12 +5,14 @@ import app.framework.Cohort12FormField;
 import app.framework.Cohort12Table;
 import app.framework.Cohort12TableCol;
 
+import java.io.Serializable;
+
 @Cohort12Form(label = "Trainer Register",
         actionUrl = "./register_trainer")
 @Cohort12Table(label = "Trainers",
         tableUrl = "./trainer_lists",
         registerUrl = "./register_trainer")
-public class Trainer{
+public class Trainer implements Serializable {
 
     @Cohort12FormField(label = "Trainer Name",
             placeholder = "Please enter Name")

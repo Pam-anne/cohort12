@@ -1,6 +1,7 @@
 package app.action;
 
 
+import app.dao.BaseDAO;
 import app.framework.Cohort12Framework;
 import app.framework.Cohort12Table;
 import jakarta.servlet.RequestDispatcher;
@@ -23,12 +24,20 @@ import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class BaseAction<T> extends HttpServlet {
+
+    private BaseDAO<T> dao;
+
+    protected BaseDAO<T> dao() {
+        if (dao == null) {
+            dao = new BaseDAO<>(this.getType());
+        }
+        return dao;
+    }
 
     @SuppressWarnings("unchecked")
     public T serializeForm(Map<String, String[]> requestMap) {
@@ -69,24 +78,16 @@ public class BaseAction<T> extends HttpServlet {
 
     }
 
-    @SuppressWarnings("unchecked")
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //if session exist use it, otherwise create a new one
-        HttpSession session = req.getSession();
 
-        List<T> register;
-        if (session.getAttribute(this.dbName()) == null)
-            register = new ArrayList<>();
-        else
-            register = (List<T>) session.getAttribute(this.dbName());
-
+        T entity;
         try {
-            register.add(this.serializeForm(req.getParameterMap()));
+            entity = this.serializeForm(req.getParameterMap());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        session.setAttribute(this.dbName(), register);
+        dao().insert(entity);
 
         if (this.getType().isAnnotationPresent(Cohort12Table.class)) {
             resp.sendRedirect(this.getType()
@@ -158,18 +159,9 @@ public class BaseAction<T> extends HttpServlet {
         return this.getType().getSimpleName() + "_DB";
     }
 
-    @SuppressWarnings("unchecked")
-    public List<T> returnData(HttpSession session){
-
+    public List<T> returnData(){
         System.out.println("DB NAME: " + this.dbName());
-
-        List<T> register;
-        if (session.getAttribute(this.dbName()) == null)
-            register = new ArrayList<>();
-        else
-            register = (List<T>) session.getAttribute(this.dbName());
-
-        return register;
+        return dao().findAll();
     }
 
 }

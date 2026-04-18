@@ -5,7 +5,6 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,10 +12,7 @@ import java.io.PrintWriter;
 public abstract class BaseListAction<T> extends BaseAction<T> {
 
     @Override
-    @SuppressWarnings("unchecked")
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // if session exist use it, otherwise create a new one
-        HttpSession session = req.getSession();
 
         PrintWriter writer = resp.getWriter();
 
@@ -39,7 +35,7 @@ public abstract class BaseListAction<T> extends BaseAction<T> {
         writer.println("<h1>About COHORT 12 Training PORTA</h1>");
         writer.println("</header>");
 
-        Cohort12Framework.htmlTable(writer, getType(), returnData(session));
+        Cohort12Framework.htmlTable(writer, getType(), returnData());
 
         RequestDispatcher dispatcher = req.getRequestDispatcher("footer");
         dispatcher.include(req, resp);
