@@ -92,12 +92,14 @@ j) Jsp -  write java inside html
         - out.println();
         - out.newLine();
     b) request = HttpServletRequest
-        - request.getParameter(String name);
-        - request.getParameterNames()
-        - request.getParameterValues()
-        - request.getParameterMap()
-        - request.setAttribute()
-        - request.getHeader(String name)
+    request.getParameter("name")         // single value from form/URL: ?name=Brian
+request.getParameterValues("hobby")  // multiple values: ?hobby=coding&hobby=music
+request.getParameterNames()          // all param names as Enumeration
+request.getParameterMap()            // all params as a Map<String, String[]>
+request.getHeader("User-Agent")      // browser info, referrer, etc.
+request.setAttribute("key", value)   // attach data to the request (for forwarding)
+request.getAttribute("key")          // retrieve it later
+        
     c) response = HttpServletResponse
         - response.setContentType(String type)
         - response.setHeader(String name, String value)

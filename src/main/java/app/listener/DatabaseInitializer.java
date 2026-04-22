@@ -17,9 +17,9 @@ import java.util.List;
 
 /**
  * Runs once on application startup:
- *   1. Creates the application database if it does not exist.
- *   2. Opens the singleton JDBC connection.
- *   3. Creates a table for every registered entity class if it does not exist.
+ * 1. Creates the application database if it does not exist.
+ * 2. Opens the singleton JDBC connection.
+ * 3. Creates a table for every registered entity class if it does not exist.
  *
  * On shutdown, closes the singleton connection.
  */
@@ -27,16 +27,15 @@ import java.util.List;
 public class DatabaseInitializer implements ServletContextListener {
 
     /** Register every persisted entity here. */
-    private static final List<Class<?>> ENTITIES = Arrays.asList(
+    private static final List<Class<?>> ENTITIES = Arrays.<Class<?>>asList(
             Person.class,
             School.class,
             Trainer.class,
-            User.class
-    );
+            User.class);
 
     private static final String DEFAULT_ADMIN_USERNAME = "admin";
     private static final String DEFAULT_ADMIN_PASSWORD = "12345";
-    private static final String DEFAULT_ADMIN_FULL_NAME = "Mike Bavon";
+    private static final String DEFAULT_ADMIN_FULL_NAME = "Pamela Abaki";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {

@@ -15,24 +15,56 @@ public class LoginFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
         HttpSession session = httpRequest.getSession(false);
 
-        String defaultUri = httpRequest.getContextPath() + "/";
-        String loginUri = httpRequest.getContextPath() + "/login";
-        String indexUri = httpRequest.getContextPath() + "/index.jsp";
-        String contactUsUri = "contact_us";
+        // String defaultUri = httpRequest.getContextPath() + "/";
+        // String loginUri = httpRequest.getContextPath() + "/login";
+        // String indexUri = httpRequest.getContextPath() + "/index.jsp";
+        // String contactUsUri = "contact_us";
+        // String welcomeUri = "welcome.jsp";
+        // String formUri = "form.jsp";
         String pageRequestUri = httpRequest.getRequestURI();
         boolean loggedIn = session != null && session.getAttribute("SESSION_ID") != null;
+            String[] publicUrls = {
+                "/login",
+                "/index.jsp",
+                "/contact_us",
+                "/welcome.jsp",
+                "/form.jsp",
+                "/greet.jsp",
+                "/login.jsp",
+                "/dashboard.jsp",
+                "/home.jsp",
+                "/about.jsp",
+                "/profile.jsp"
+        };
 
-        if(loggedIn || pageRequestUri.equalsIgnoreCase(loginUri)
-                || pageRequestUri.equalsIgnoreCase(defaultUri)
-                || pageRequestUri.equalsIgnoreCase(indexUri)
-                || pageRequestUri.contains(contactUsUri)){
+        // if(loggedIn || pageRequestUri.equalsIgnoreCase(loginUri)
+        //         || pageRequestUri.equalsIgnoreCase(defaultUri)
+        //         || pageRequestUri.equalsIgnoreCase(indexUri)
+        //         || pageRequestUri.contains(contactUsUri) 
+        //         || pageRequestUri.contains(welcomeUri)
+        //     || pageRequestUri.contains(formUri)){
+        //     filterChain.doFilter(servletRequest, servletResponse);
+
+        // } else {
+        //     if (session != null)
+        //         session.invalidate();
+
+        //     httpResponse.sendRedirect(loginUri);
+        // }
+        boolean isPublic = false;
+
+        for (String url : publicUrls) {
+            if (pageRequestUri.endsWith(url) ) {
+                isPublic = true;
+                break;
+            }
+        }
+
+        if (loggedIn || isPublic) {
             filterChain.doFilter(servletRequest, servletResponse);
-
         } else {
-            if (session != null)
-                session.invalidate();
-
-            httpResponse.sendRedirect(loginUri);
+            if (session != null) session.invalidate();
+            httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
         }
 
     }

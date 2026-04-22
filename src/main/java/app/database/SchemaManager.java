@@ -71,6 +71,7 @@ public final class SchemaManager {
 
         ddl.append(")");
 
+        
         try (Statement stmt = DatabaseConnection.get().createStatement()) {
             stmt.executeUpdate(ddl.toString());
             System.out.println("[SchemaManager] Ensured table: " + tableName);

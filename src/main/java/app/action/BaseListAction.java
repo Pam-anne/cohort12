@@ -30,6 +30,10 @@ public abstract class BaseListAction<T> extends BaseAction<T> {
 
         writer.println("<body>");
 
+        // Include navbar
+        RequestDispatcher navDispatcher = req.getRequestDispatcher("navbar");
+        navDispatcher.include(req, resp);
+
         // Header
         writer.println("<header>");
         writer.println("<h1>About COHORT 12 Training PORTA</h1>");

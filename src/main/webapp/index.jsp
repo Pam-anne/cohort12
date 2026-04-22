@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page isELIgnored ="false" %>
 <%@ page import="app.utility.Courses" %>
 <%@ page import="java.time.LocalTime" %>
 
@@ -96,7 +97,14 @@
     <!-- Schedule -->
     <section>
         <h2>Upcoming Schedule</h2>
-        <p>Weekday Classes: 6:00 PM - 8:00 PM</p>
+        <jsp:useBean id="weekday" class="app.model.Schedule" />
+        <jsp:setProperty name="weekday" property="scheduleType" value="Weekday Classes:" />
+        <jsp:setProperty name="weekday" property="scheduleTime" value="6:00 PM - 8:00 PM" />
+        <p><jsp:getProperty name="weekday" property="scheduleType" />
+            ${weekday.scheduleTime}
+        <!-- <jsp:getProperty name="weekday" property="scheduleTime"  /> -->
+      </p>
+        
         <p>Weekend Bootcamps: 9:00 AM - 1:00 PM</p>
     </section>
 

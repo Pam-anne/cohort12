@@ -59,6 +59,14 @@
       <scope>compile</scope>
     </dependency>
 
+    <!-- JSTL API -->
+    <dependency>
+    <groupId>jakarta.servlet.jsp.jstl</groupId>
+    <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+    <version>3.0.0</version>
+    <!-- <scope>provided</scope> -->
+    </dependency>
+
   </dependencies>
   <build>
     <finalName>cohort12</finalName>
